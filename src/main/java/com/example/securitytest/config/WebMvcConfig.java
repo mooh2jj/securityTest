@@ -1,4 +1,4 @@
-package config;
+package com.example.securitytest.config;
 
 
 import org.springframework.boot.web.servlet.view.MustacheViewResolver;
