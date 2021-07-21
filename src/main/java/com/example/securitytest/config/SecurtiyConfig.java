@@ -2,6 +2,7 @@ package com.example.securitytest.config;
 
 import com.example.securitytest.config.oauth.PrincipalOauthUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -13,10 +14,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)   // 특정 주소로 접근을 하면 권한 및 인증을 미리 체크하겠다는 뜻.
-@RequiredArgsConstructor
 public class SecurtiyConfig extends WebSecurityConfigurerAdapter{
 
-	final private PrincipalOauthUserService principalOauthUserService;
+	@Autowired
+	private PrincipalOauthUserService principalOauthUserService;
 
 	@Bean
 	public BCryptPasswordEncoder encodePwd() {

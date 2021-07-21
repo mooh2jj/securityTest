@@ -6,7 +6,9 @@ import com.example.securitytest.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,14 +26,30 @@ public class ApiController {
     @ResponseBody
     public String loginTest(
             Authentication authentication,
-            @AuthenticationPrincipal PrincipalDetails principalDetails2
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         System.out.println("/test/login ============");
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("authentication: " + principalDetails.getUser());
+        System.out.println("authentication: " + authentication.getPrincipal());
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();   // 구글에서는 오류가 남! classCastException
 
-        System.out.println("userDetails: "+ principalDetails2.getUser());
+        System.out.println("principalDetails: " + principalDetails.getUser());
+        System.out.println("userDetails: " + userDetails.getUsername());
         return "session check";
+    }
+
+
+    @GetMapping("/test/oauth/login")
+    @ResponseBody
+    public String loginOauthTest(
+            Authentication authentication,
+            @AuthenticationPrincipal OAuth2User oAuth2
+    ) {
+        System.out.println("/test/oauth/login ============");
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        System.out.println("authentication: " + oAuth2User.getAttributes());
+        System.out.println("authentication: " + oAuth2.getAttributes());
+
+        return "Oauth session check";
     }
 
 
@@ -40,9 +58,12 @@ public class ApiController {
         return "index";
     }
 
+    // OAuth 로그인을 해도
+    // 일반 로그인을 해도 PrincipalDetails로 접근해짐.
     @GetMapping("/user")
     @ResponseBody
-    public String user(){
+    public String user(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        System.out.println("principalDetails: "+ principalDetails.getUser());
         return "user";
     }
 
