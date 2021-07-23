@@ -1,6 +1,8 @@
 package com.example.securitytest.config.oauth;
 
 import com.example.securitytest.config.auth.PrincipalDetails;
+import com.example.securitytest.config.oauth.provider.FacebookUserInfo;
+import com.example.securitytest.config.oauth.provider.OAuth2UserInfo;
 import com.example.securitytest.model.User;
 import com.example.securitytest.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +26,30 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         System.out.println("getClientRegistration: "+userRequest.getClientRegistration());
         System.out.println("getAccessToken: "+userRequest.getAccessToken().getTokenValue());
-//        System.out.println("getAdditionalParameters: "+userRequest.getAdditionalParameters());
-        System.out.println("super.loadUser(userRequest).getAttributes: "+super.loadUser(userRequest).getAttributes());
 
         // oauth 회원가입 강제 등록
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
+        System.out.println("getAdditionalParameters: "+userRequest.getAdditionalParameters());
+        System.out.println("super.loadUser(userRequest).getAttributes: "+oAuth2User.getAttributes());
+
+
+        OAuth2UserInfo oAuth2UserInfo = null;
+
+        if(userRequest.getClientRegistration().getRegistrationId().equals("google")){
+            System.out.println("구글 로그인 요청");
+        } else if (userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
+            System.out.println("페이스북 로그인 요청");
+            oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+        } else {
+            System.out.println("우리는 구글과 페이스북만 지원합니다.");
+        }
+
 //        System.out.println("getAdditionalParameters: "+userRequest.getAdditionalParameters());
 //        System.out.println("getAttributes: "+oAuth2User.getAttributes());
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();    // google, facebook
-        String providerId = oAuth2User.getAttribute("sub");                // facebook일 때는 null
+        String provider = oAuth2UserInfo.getProvider();    // google, facebook
+        String providerId = oAuth2UserInfo.getProviderId();                // facebook일 때는 null
         String username = provider + "_" + providerId;							// google_1097~~
         String password = bCryptPasswordEncoder.encode("getitthere");
         String email = oAuth2User.getAttribute("email");

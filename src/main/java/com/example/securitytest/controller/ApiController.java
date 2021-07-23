@@ -83,6 +83,12 @@ public class ApiController {
         return "loginForm";
     }
 
+    @GetMapping("/logout.do")
+    public String logout() {
+        System.out.println("logout");
+        return "redirect:/loginForm";
+    }
+
     @GetMapping("/joinForm")
     public String joinForm() {
 //		System.out.println("joinForm controller start...");
